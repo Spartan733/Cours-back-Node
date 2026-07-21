@@ -140,3 +140,74 @@ app.use('/api/v1/users', userRoutes)
 ### Architecture recommander (MVC simplifié)
 
 ```
+
+mon-api/
+├── app.js
+├── routes/         → définit les endpoints, dirige vers les contrôleurs
+├── controllers/    → logique métier, prépare la réponse
+├── middlewares/    → s'exécute avant la route finale
+└── models/         → schéma des données, interaction avec la BDD
+
+
+## 5. Les middlewares
+
+Un middlewares est une fonction qui à accès à `req`, `res`, et à `next()`. Elle s'éxecute **avant** que la requete n'atteigne sa route finale, et peut :
+* lire ou modifier `req` et `res`,
+* arretter la requete en renvoyant une réponse,
+* ou la laisser continuer en appeleant `next()`.
+
+Avec les middlewares vous pouvez tester l'authentification, faire une middleware de gestion d'erreurs, de log, etc.
+
+Les middlewares s'executent **dans l'ordre où ils sont déclarés** avec `app.use()`.
+
+
+### Exemple 1 - Middlewares de journalisation
+```javascript
+const express = require('express')
+const app = express()
+
+//Middleware global : s'applique à toutes les requêtes
+app.use((req, res, nextx) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`)
+    next() // indispensable : passe la main a la suite
+})
+
+app.get('/', req, res) => {
+    res.send('Accueil')
+}
+
+app.listen(3000)
+```
+
+
+### Exemple 2 - Middlewares intégrés à Express (parsing du body)
+```javascript
+app.use(express.json()) //parse les requetes JSON
+app.use(express.urlcoded({extend: true}))   //parse les formulaires classiques
+
+app.post('/data', (req, res) => {
+    console.log(req.body) // accessible uniquement grâce au middleware ci dessous
+    res.send('Données reçues')
+})
+```
+
+### Exemple 3 - Middleware d'authentification simple (sur une route précise)
+Un middleware peut etre global (`app.use`) ou appliquer à une seul route, en le passant comme argument avant le handler final :
+
+```javascript
+function checkToken(req, res, next) {
+    const token = req.headers['authorization']
+
+    if(!token){
+        return res.status(401).json({message: 'Accès refusé: token manquant'})
+    }
+
+    // On intègre la logique de vérification du token
+    next() // token_valide, on continue vers la route
+}
+
+// Au niveau de la route concernée
+// On applique le midleware à une route spécifique
+router.delete('/:id', checkToken, productController.deleteProduct)
+```
+**Point clé:** si `next()` n'est jamais appelé (et qu'aucune réponse n'est envoyée), la requete reste bloqué indéfiniment coté client.
