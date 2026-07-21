@@ -211,3 +211,16 @@ function checkToken(req, res, next) {
 router.delete('/:id', checkToken, productController.deleteProduct)
 ```
 **Point clé:** si `next()` n'est jamais appelé (et qu'aucune réponse n'est envoyée), la requete reste bloqué indéfiniment coté client.
+
+## 6. L'authentification
+Afin de gérer un système d'authentification vous allez avoir besoin de deux choses :
+* **bcrypt :** Pour hasher les mots de passe utilisateur
+* **jsonwebtoken :** Pour gérer les jetons d'autehtification
+
+Les jetons d'autehtification (token) peuvent etre encodés avec une durée spécifique ainsi qu'avec des informations supplémentaires. Généralement on y ajoute l'id de l'utilisateur.
+
+
+### Installation des packages
+```bash
+npm install bcryptjs jsonwebtoken
+```
