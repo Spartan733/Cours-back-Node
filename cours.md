@@ -23,3 +23,120 @@ REST(*REpresentational State Transfer*) est un style d'architecture défini par 
 | 4 | Interface uniforme | Les ressources sont identifiées par des URI, manipulées via des représentations (JSON...) |
 | 5 | Système en couches | Le client ignore s'il parle au serveur final ou a un proxy/load balancer |
 | 6 | Code à la demande *(optionnel)* | Le serveur peut envoyer du code au client exécutable au client |
+
+### Une API RESTfull, concrétement
+
+* Une **ressource** = une entité métier (un produit, un utilisateur...), identifiée par une URI.
+* On nomme les URI avec des **noms**, jamais de verbes :
+    * ✅ `GET /api/products`
+    * ❌ `GET/api/getAllProducts`
+* Les actions (créer/lire/modifier/supprimer) sont portées par le **verbe HTTP**, pas par l'URI
+
+| Verbe HTP | Action CRUD | Exemple |
+|-----------|-------------|---------|
+| GET | Read | `GET /api/products/123` |
+| POST | Creat | `POST /api/products` |
+| PUT | Update (remplacement complet) | `PUT /api/products/123` |
+| PATCH | Update (modification partielle) | `PATCH /api/products/123` |
+| DELETE | Delete | `DELETE /api/products/123` |
+
+### Codes de statut HTP à connaitre
+
+* **2xx - Succès** : `200 OK`, `201 Create`, `204 No Content`
+* **4xx - Erreur Client** : `400 Bad Request`, `401 Unauthorized`, `404 Forbidden` `404 Not Found`
+* **5xx - Erreur Serveur** : `500 Internal Serveur Error`
+
+---
+
+## 3. Node.js et Express.js
+
+### Node.js
+Un environnement d'execution JavaScript coté serveur base sur le moteur V8 de Chrome. Il permet d'utiliser le meme langage (js) sur le front et le back, et gère efficacement de nombreuses connexions simultanées grâce a son modele asynchrone non bloquant.
+
+### Express.js
+un framework web minimaliste pour Node.js. Il facilite :
+* La définition de routes HTTP,
+* L'utilisation de middlewares,
+* La connexion à une base de données,
+* L'envoie de réponses (JSON, HTML,...)
+
+---
+
+## 4. Mettre en place un seveur Express
+
+### Etape 1 - Initialiser le projet
+```bash
+npm init -y
+```
+
+### Etape 2 - Installer Express
+```bash
+npm install express # où
+npm i expres
+```
+
+### Etape 3 - Créer le fichier `app.js`
+```javascript
+const express = require('express')
+const app = express()
+cont port = 3000
+
+//      URL
+app.get('/'? (req, res) => {
+    res.send('Bienvenue sur mon API RESTfull !')
+})
+
+app.listen(port, () => {
+    // Ce console log s'affiche uniquement coté SERVEUR et non coté CLIENT
+    console.log(`Serveur démarré sur http://localhost:${port}`)
+})
+```
+
+
+### Etape 4 - Lancer le serveur
+```bash
+node app.js # où
+nodemon app.js
+```
+
+Pour lancer le serveur avec nodemon, vous devez l'installer avec `npm instal -g nodemon`.
+Lancer le serveur avec nodemon permet de recharger automatiquelebt e serveur a chaque changement de vos fichiers, un peu comme fait l'extension Live Server.
+Vous pouvez ouvrir `http://localhost:3000` dans le navigateur.
+
+### Organiser le code avec `express.Router()`
+Pour ne pas tout entasser dans `app.js`, on sépare les routes par ressourrce :
+
+```javascript
+// routes/users.js
+const express = require('express')
+const router = express.Router()
+
+router.get('/', (req, res) => {
+    res.json([
+        {
+            id: 1,
+            name: "Lucas"
+        }
+        {
+            id: 2,
+            name: "Gabriel"
+        }
+    ])
+})
+
+router.get('/:id', (req,res) => {
+    res.send(`Détail de l'utilisateur : ${req.params.id}`)
+})
+
+//Trés important pour pouvoir l'utiliser
+module.exports = router
+```
+
+```javascript
+// app.js
+const userRoutes = require('./routes/users.js')
+app.use('/api/v1/users', userRoutes)
+
+### Architecture recommander (MVC simplifié)
+
+```
