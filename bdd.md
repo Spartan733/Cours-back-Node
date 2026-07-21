@@ -70,7 +70,7 @@ Ensuite, dans votre fichier `app.js` (ou un fichier de configuration de base de 
 const mongoose = require('mongoose')
 
 //const dbURI = "mongosb+srv://DONNEES_DE_MONGODB"
-const dbURI = "mongodb+srv://gabrielbois_db_user:v18H2emc2pzSuKFV@coursback.eiv91fn.mongodb.net/?appName=CoursBack"
+const dbURI = "mongodb+srv://..."
 // const dbURI = "mongodb+srv://<NomUtilisateur>:<MotDePasse>@<Serveur>/?appName=<NomDuCluster>"
 
 mongoose.connect(dbURI)
